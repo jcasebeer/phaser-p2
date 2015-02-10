@@ -1,4 +1,4 @@
-
+"use strict";
 BasicGame.Game = function (game) {
 
     //  When a State is added to Phaser it automatically has the following properties set on it, even if they already exist:
@@ -23,11 +23,60 @@ BasicGame.Game = function (game) {
     //  You can use any of these from any function within this State.
     //  But do consider them as being 'reserved words', i.e. don't create a property for your own game called "world" or you'll over-write the world reference.
 
+    this.leftKey = null;
+    this.rightKey = null;
+    this.upKey = null;
+    this.downKey = null;
+
+    this.border_spr = null;
+
+    this.cats = [4];
+
+    this.selector = null;
 };
 
 BasicGame.Game.prototype = {
 
     create: function () {
+
+        frameBuffer = this.add.bitmapData(400,300);
+        frameBuffer.addToWorld(0,0,0,0,2,2);
+        frameBuffer.smoothed = false;
+
+        game.world.setBounds(0,0,3200,3200);
+
+        this.border_spr = game.add.image(0,0,'border');
+        this.border_spr.scale.setTo(2,2);
+        this.border_spr.bringToTop();
+
+        this.selector = game.add.image(800,0,'selector');
+
+
+        this.cats[0] = game.add.image(800,0,'cat');
+        this.cats[1] = game.add.image(800,120,'cat');
+        this.cats[2] = game.add.image(800,240,'cat');
+        this.cats[3] = game.add.image(800,360,'cat');
+
+        this.cats[0].bringToTop();
+        this.cats[1].bringToTop();
+        this.cats[2].bringToTop();
+        this.cats[3].bringToTop();
+
+
+        for(var i = 0; i<32; i++)
+            entities.push(new entity(Math.random()*3200,Math.random()*3200,0,'cactus'));
+
+        this.leftKey = this.input.keyboard.addKey(Phaser.Keyboard.LEFT);
+        this.input.keyboard.addKeyCapture(Phaser.Keyboard.LEFT);
+
+        this.rightKey = this.input.keyboard.addKey(Phaser.Keyboard.RIGHT);
+        this.input.keyboard.addKeyCapture(Phaser.Keyboard.RIGHT);
+
+        this.upKey= this.input.keyboard.addKey(Phaser.Keyboard.UP);
+        this.input.keyboard.addKeyCapture(Phaser.Keyboard.UP);
+
+        this.downKey = this.input.keyboard.addKey(Phaser.Keyboard.DOWN);
+        this.input.keyboard.addKeyCapture(Phaser.Keyboard.DOWN);
 
         //  Honestly, just about anything could go here. It's YOUR game after all. Eat your heart out!
         console.log("GAME: CREATE");
@@ -36,7 +85,45 @@ BasicGame.Game.prototype = {
     update: function () {
 
         //  Honestly, just about anything could go here. It's YOUR game after all. Eat your heart out!
-        console.log("GAME: UPDATE");
+        console.log("GAME: UPDATE\nCAMX :"+CAMX+"\nCAMY :"+CAMY);
+        
+        if (this.leftKey.isDown)
+            CAMDIR--;
+        if (this.rightKey.isDown)
+            CAMDIR++;
+
+        if (this.upKey.isDown)
+        {
+            CAMX+=lengthdir_x(2,CAMDIR);
+            CAMY+=lengthdir_y(2,CAMDIR);
+        }
+
+        if (this.downKey.isDown)
+        {
+            CAMX+=lengthdir_x(1,CAMDIR+180);
+            CAMY+=lengthdir_y(1,CAMDIR+180);
+        }
+
+        while(CAMDIR>360)
+            CAMDIR-=360;
+
+        while (CAMDIR<0)
+            CAMDIR+=360
+
+
+        frameBuffer.clear();
+
+        var i = entities.length;
+
+        while(i--)
+        {
+            entities[i].draw();
+        }
+
+        //frameBuffer.circle(CAMX,CAMY,4,'#ffffff');
+        //frameBuffer.circle(CAMX+lengthdir_x(4,CAMDIR),CAMY+lengthdir_y(4,CAMDIR),2,'#ffffff');
+
+        //frameBuffer.draw('border',0,0);
     },
 
     quitGame: function (pointer) {

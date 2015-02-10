@@ -1,8 +1,10 @@
-
+"use strict";
 BasicGame.MainMenu = function (game) {
 
 	//this.music = null;
 	//this.playButton = null;
+	this.startKey = null;
+	this.border_spr = null;
 
 };
 
@@ -16,11 +18,21 @@ BasicGame.MainMenu.prototype = {
 
 		//this.music = this.add.audio('titleMusic');
 		//this.music.play();
-
+		this.stage.backgroundColor = '#000000';
 		//this.add.sprite(0, 0, 'titlepage');
+		this.add.text(400,300,"TANK CATZ\nPRESS X TO START", {
+			font: "32px Courier New",
+			fill: "#ffffff",
+        	align: "center"
+		}).anchor.setTo(0.5,0.5);
+
+		this.border_spr = this.add.image(0,0,'border');
+		this.border_spr.scale.setTo(2,2);
+
 
 		//this.playButton = this.add.button(400, 600, 'playButton', this.startGame, this, 'buttonOver', 'buttonOut', 'buttonOver');
-
+		this.startKey = this.input.keyboard.addKey(Phaser.Keyboard.X);
+		this.input.keyboard.addKeyCapture(Phaser.Keyboard.X);
 		console.log("MAIN MENU: CREATE");
 	},
 
@@ -28,7 +40,8 @@ BasicGame.MainMenu.prototype = {
 
 		//	Do some nice funky main menu effect here
 		console.log("MAIN MENU: UPDATE");
-		this.startGame();
+		if (this.startKey.isDown)
+			this.startGame();
 
 	},
 

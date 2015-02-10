@@ -1,4 +1,4 @@
-
+"use strict";
 BasicGame.Preloader = function (game) {
 
 	this.background = null;
@@ -29,6 +29,10 @@ BasicGame.Preloader.prototype = {
 		//this.load.audio('titleMusic', ['audio/main_menu.mp3']);
 		//this.load.bitmapFont('caslon', 'fonts/caslon.png', 'fonts/caslon.xml');
 		//	+ lots of other required assets here
+		this.load.image('cactus','assets/cactus.png');
+		this.load.image('border','assets/border.png');
+		this.load.image('cat','assets/cat.png');
+		this.load.image('selector','assets/selector.png');
 
 		console.log("PRELOAD: PRELOAD");
 
