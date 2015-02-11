@@ -3,7 +3,6 @@ BasicGame.MainMenu = function (game) {
 
 	//this.music = null;
 	//this.playButton = null;
-	this.startKey = null;
 	this.border_spr = null;
 
 };
@@ -31,8 +30,6 @@ BasicGame.MainMenu.prototype = {
 
 
 		//this.playButton = this.add.button(400, 600, 'playButton', this.startGame, this, 'buttonOver', 'buttonOut', 'buttonOver');
-		this.startKey = this.input.keyboard.addKey(Phaser.Keyboard.X);
-		this.input.keyboard.addKeyCapture(Phaser.Keyboard.X);
 		console.log("MAIN MENU: CREATE");
 	},
 
@@ -40,7 +37,7 @@ BasicGame.MainMenu.prototype = {
 
 		//	Do some nice funky main menu effect here
 		console.log("MAIN MENU: UPDATE");
-		if (this.startKey.isDown)
+		if (shootKey.isDown)
 			this.startGame();
 
 	},

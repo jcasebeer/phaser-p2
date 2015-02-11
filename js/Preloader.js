@@ -33,6 +33,7 @@ BasicGame.Preloader.prototype = {
 		this.load.image('border','assets/border.png');
 		this.load.image('cat','assets/cat.png');
 		this.load.image('selector','assets/selector.png');
+		this.load.image('mountain','assets/mountain.png');
 
 		console.log("PRELOAD: PRELOAD");
 

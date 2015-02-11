@@ -45,6 +45,27 @@ BasicGame.Boot.prototype = {
 
         //  By this point the preloader assets have loaded to the cache, we've set the game settings
         //  So now let's start the real preloader going
+
+        // add our games keys
+
+        leftKey = game.input.keyboard.addKey(Phaser.Keyboard.LEFT);
+    game.input.keyboard.addKeyCapture(Phaser.Keyboard.LEFT);
+
+    rightKey = game.input.keyboard.addKey(Phaser.Keyboard.RIGHT);
+    game.input.keyboard.addKeyCapture(Phaser.Keyboard.RIGHT);
+
+    upKey= game.input.keyboard.addKey(Phaser.Keyboard.UP);
+    game.input.keyboard.addKeyCapture(Phaser.Keyboard.UP);
+
+    downKey = game.input.keyboard.addKey(Phaser.Keyboard.DOWN);
+    game.input.keyboard.addKeyCapture(Phaser.Keyboard.DOWN);
+
+    shootKey = game.input.keyboard.addKey(Phaser.Keyboard.X);
+    game.input.keyboard.addKeyCapture(Phaser.Keyboard.X);
+
+    swapKey = game.input.keyboard.addKey(Phaser.Keyboard.Z);
+    game.input.keyboard.addKeyCapture(Phaser.Keyboard.Z);
+
         this.state.start('Preloader');
         console.log("BOOT: CREATE");
 
