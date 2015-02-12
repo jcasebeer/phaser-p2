@@ -184,13 +184,11 @@ function tank(x,y)
 
     this.step = function()
     {
-            this.PhSprite.frame
 
             if (this.PhSprite.frame === 0)
                 this.PhSprite.frame = 1;
             else
                 this.PhSprite.frame = 0;
-            
     }
 }
 
