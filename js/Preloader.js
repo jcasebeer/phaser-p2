@@ -36,8 +36,11 @@ BasicGame.Preloader.prototype = {
 		this.load.image('mountain','assets/mountain.png');
 		this.load.image('bullet','assets/bullet.png');
 		this.load.image('alphaMask','assets/lowalpha.png');
-		game.load.spritesheet('tank','assets/tank.png',32,32);
+		this.load.spritesheet('tank','assets/tank.png',32,32,4);
 
+		game.load.audio('snd_shoot','assets/shoot.ogg',true);
+        game.load.audio('snd_explode','assets/explode.ogg',true);
+        game.load.audio('snd_meow','assets/meow.ogg',true);
 
 		console.log("PRELOAD: PRELOAD");
 

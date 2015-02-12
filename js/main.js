@@ -3,7 +3,9 @@
 var game, frameBuffer, obj_player;
 var entities = [];
 
-var leftKey,rightKey,upKey,downKey,shootKey,swapKey;
+var leftKey,rightKey,upKey,downKey,shootKey,swapKey,aKey,dKey;
+
+var snd_shoot,snd_explode,snd_meow;
 
 var CAMDIR = 0;
 var CAMX=16000;
@@ -170,7 +172,6 @@ function cactus(x,y)
         this[i] = parent[i];
 
     this.fadeIn = 1;
-
 }
 
 function tank(x,y)
@@ -180,19 +181,47 @@ function tank(x,y)
         this[i] = parent[i];
 
     this.angle = point_direction(this.x,this.y,CAMX,CAMY);
-    this.PhSprite.frame = 0;
 
     this.step = function()
     {
 
-            if (this.PhSprite.frame === 0)
-                this.PhSprite.frame = 1;
-            else
-                this.PhSprite.frame = 0;
+        this.angle = point_direction(this.x,this.y,CAMX,CAMY)+Math.random()*60-30;
+
+        if (this.dist < 320)
+        {
+            this.speed=1;
+            if ( Math.random()<0.05) 
+            {
+                this.dir = Math.random()*360;
+                
+            }
+
+            if ( Math.random()<0.01) 
+                entityCreate( new bullet(this.x,this.y,this.angle+Math.random()*8-4,8,this.speed,1) );
+
+        }
+        else
+        {
+            this.speed = 5;
+            this.dir = this.angle;
+        }
+        
+
+        for( var i in entities)
+            if (entities[i] instanceof bullet && entities[i].alive===true && entities[i].target===0)
+                if ( point_distance(this.x,this.y,entities[i].x,entities[i].y)<32)
+                {
+                    this.alive = false;
+                    entities[i].alive = false;
+                    SCREEN_SHAKE+=8;
+                    snd_explode.play();
+                }
+        this.moveToDir();
     }
+
 }
 
-function bullet(x,y,dir,speed,lspeed)
+function bullet(x,y,dir,speed,lspeed,target)
 {
     var parent = new entity(x,y,0,'bullet');
     for (var i in parent)
@@ -202,6 +231,7 @@ function bullet(x,y,dir,speed,lspeed)
     this.yspeed = lengthdir_y(speed+lspeed,dir);
     this.life = 300;
     this.fadeIn = 1;
+    this.target = target
 
     console.log("MAKE BULLET");
 
@@ -243,10 +273,12 @@ function player(x,y)
         {
             this.canSwap = false;
 
-            if (this.cat<3)
+            if (this.cat<1)
                 this.cat++;
             else
                 this.cat = 0;
+
+            snd_meow.play();
         }
         if (!this.canSwap && swapKey.isUp)
         {
@@ -273,24 +305,26 @@ function player(x,y)
                 this.dir++;
             }
         }
-        else 
-        if (this.cat === 1 )
+        
+        if (this.cat === 0 )
         {
             //cannon cat
-            if (leftKey.isDown)
+            if (aKey.isDown)
             {
                 this.gundir-=2;
             }
-            if (rightKey.isDown)
+            if (dKey.isDown)
             {
                 this.gundir+=2;
             }
             if (shootKey.isDown && this.canShoot)
             {
-                entityCreate( new bullet(this.x,this.y,this.gundir+Math.random()*8-4,8,this.speed) );
+                entityCreate( new bullet(this.x,this.y,this.gundir+Math.random()*8-4,8,this.speed,0) );
                 this.canShoot = false;
                 this.shootTimer = 16;
-                SCREEN_SHAKE += 16;
+                SCREEN_SHAKE += 4;
+                snd_shoot.play();
+
             }
         }
         else 
@@ -319,6 +353,17 @@ function player(x,y)
 
         if (this.speed<0)
             this.speed+=0.01
+
+
+        for( var i in entities)
+            if (entities[i] instanceof bullet && entities[i].alive===true && entities[i].target===1)
+                if ( point_distance(this.x,this.y,entities[i].x,entities[i].y)<32)
+                {
+                    entities[i].alive = false;
+                    SCREEN_SHAKE+=16;
+                    snd_explode.play();
+                }
+
         this.moveToDir();
     }
 
@@ -326,15 +371,14 @@ function player(x,y)
     {
         if (this.cat===1)
         {
-            CAMDIR = this.gundir;
             CAMZ = 32;
         }
         else
         {
-            CAMDIR = this.dir;
             CAMZ = 0;
-            this.gundir = this.dir;
         }
+
+        CAMDIR = this.gundir;
 
         CAMX = this.x;
         CAMY = this.y;
@@ -367,8 +411,15 @@ function manageCacti()
                     entityCreate(new cactus(x*CACTUS_TILESIZE+rand()*CACTUS_TILESIZE,y*CACTUS_TILESIZE+rand()*CACTUS_TILESIZE) );
                 }
             }
-
-
+    }
+}
+var tanks = 0;
+function manageTanks()
+{
+    if (Math.random()<0.005 && tanks<15)
+    {
+        tanks++;
+        entityCreate(new tank(obj_player.x+lengthdir_x(1000,Math.random()*360),obj_player.y+lengthdir_y(1000,Math.random()*360) ) );
     }
 }
 

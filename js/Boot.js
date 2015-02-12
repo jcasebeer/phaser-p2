@@ -60,11 +60,27 @@ BasicGame.Boot.prototype = {
     downKey = game.input.keyboard.addKey(Phaser.Keyboard.DOWN);
     game.input.keyboard.addKeyCapture(Phaser.Keyboard.DOWN);
 
+    aKey= game.input.keyboard.addKey(Phaser.Keyboard.A);
+    game.input.keyboard.addKeyCapture(Phaser.Keyboard.A);
+
+    dKey = game.input.keyboard.addKey(Phaser.Keyboard.D);
+    game.input.keyboard.addKeyCapture(Phaser.Keyboard.D);
+
     shootKey = game.input.keyboard.addKey(Phaser.Keyboard.X);
     game.input.keyboard.addKeyCapture(Phaser.Keyboard.X);
 
     swapKey = game.input.keyboard.addKey(Phaser.Keyboard.Z);
     game.input.keyboard.addKeyCapture(Phaser.Keyboard.Z);
+
+    // add sound "sprites"
+        snd_shoot = game.add.audio('snd_shoot');
+        snd_shoot.allowMultiple = true;
+
+        snd_explode  = game.add.audio('snd_explode');
+        snd_explode.allowMultiple = true;
+
+        snd_meow  = game.add.audio('snd_meow');
+        snd_meow.allowMultiple = false;
 
         this.state.start('Preloader');
         console.log("BOOT: CREATE");
