@@ -3,7 +3,7 @@ BasicGame.Game = function (game) {
 
     //  When a State is added to Phaser it automatically has the following properties set on it, even if they already exist:
 
-    this.game;      //  a reference to the currently running game (Phaser.Game)
+    /*this.game;      //  a reference to the currently running game (Phaser.Game)
     this.add;       //  used to add sprites, text, groups, etc (Phaser.GameObjectFactory)
     this.camera;    //  a reference to the game camera (Phaser.Camera)
     this.cache;     //  the game cache (Phaser.Cache)
@@ -19,7 +19,7 @@ BasicGame.Game = function (game) {
     this.particles; //  the particle manager (Phaser.Particles)
     this.physics;   //  the physics manager (Phaser.Physics)
     this.rnd;       //  the repeatable random number generator (Phaser.RandomDataGenerator)
-
+    */
     //  You can use any of these from any function within this State.
     //  But do consider them as being 'reserved words', i.e. don't create a property for your own game called "world" or you'll over-write the world reference.
 
@@ -28,6 +28,8 @@ BasicGame.Game = function (game) {
     this.cats = [4];
 
     this.selector = null;
+    this.frameCam = null;
+    this.alphaMask = null;
 };
 
 BasicGame.Game.prototype = {
@@ -35,12 +37,17 @@ BasicGame.Game.prototype = {
     create: function () {
 
         frameBuffer = this.add.bitmapData(400,300);
-        frameBuffer.addToWorld(0,0,0,0,2,2);
+        this.frameCam = frameBuffer.addToWorld(0,0,0,0,2,2);
         frameBuffer.smoothed = false;
 
         game.world.setBounds(0,0,32000,32000);
 
+        this.alphaMask = game.make.image(0,0,'alphaMask');
+        this.alphaMask.scale.setTo(100,100);
+        this.alphaMask.alpha = 0.34;
+
         obj_player = new player(16000,16000);
+        entityCreate(new tank(16010,16010));
 
         this.border_spr = game.add.image(0,0,'border');
         this.border_spr.scale.setTo(2,2);
@@ -70,13 +77,33 @@ BasicGame.Game.prototype = {
 
         obj_player.step();
         obj_player.draw();
+        
         this.selector.y = obj_player.cat*120;
-        frameBuffer.clear();
 
+        if (SCREEN_SHAKE>64)
+            SCREEN_SHAKE = 64;
+
+        this.frameCam.x = Math.random()*SCREEN_SHAKE; - SCREEN_SHAKE/2;
+        this.frameCam.y = Math.random()*SCREEN_SHAKE; - SCREEN_SHAKE/2;
+
+        if (SCREEN_SHAKE>0)
+            SCREEN_SHAKE--;
+
+        //frameBuffer.clear();
+        frameBuffer.draw(this.alphaMask);
         drawSun();
 
         var i = entities.length;
+        while(i--)
+        {
+            entities[i].step();
+            entities[i].update();
+            if (entities[i].alive === false)
+                entityDestroy(i);
+        }
 
+        entities.sort( function(a,b){ return (a.dist - b.dist)} );
+        i = entities.length;
         while(i--)
         {
             entities[i].draw();

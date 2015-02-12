@@ -34,6 +34,10 @@ BasicGame.Preloader.prototype = {
 		this.load.image('cat','assets/cat.png');
 		this.load.image('selector','assets/selector.png');
 		this.load.image('mountain','assets/mountain.png');
+		this.load.image('bullet','assets/bullet.png');
+		this.load.image('alphaMask','assets/lowalpha.png');
+		game.load.spritesheet('tank','assets/tank.png',32,32);
+
 
 		console.log("PRELOAD: PRELOAD");
 

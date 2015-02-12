@@ -14,11 +14,22 @@ var CAMMAPX = 0
 var CAMMAPY = 0
 var CAMDIST = 180;
 var CACTUS_TILESIZE = 800;
+var SCREEN_SHAKE = 0;
+
 
 function degstorads(degs) 
 //Given Degrees, Return Radians
 {
     return degs * (Math.PI/180);
+}
+
+function clamp(val,min,max)
+{
+    if (val<min)
+        return min;
+    if (val>max)
+        return max;
+    return val;
 }
 
 function lengthdir_x(len,dir)
@@ -105,15 +116,19 @@ function entity(x,y,dir,sprite)
     //variables for projecting the sprites in 3d
     this.xv = 0;
     this.yv = 0;
-    this.dist = 0;
+    this.dist = point_distance(CAMX,CAMY,this.x,this.y);
     this.offset = 0;
     this.scale = 0;
     this.fadeIn = 0;
 
-
     this.step = function()
     {
 
+    }
+
+    this.update = function()
+    {
+        this.dist = point_distance(CAMX,CAMY,this.x,this.y);
     }
 
     this.moveToDir = function()
@@ -133,15 +148,15 @@ function entity(x,y,dir,sprite)
         this.xv = this.x - CAMX;
         this.yv = this.y - CAMY;
 
-        this.dist = point_distance(CAMX,CAMY,this.x,this.y);
         this.offset = Math.atan2(this.yv,this.xv) - degstorads(CAMDIR);
         this.scale = (CAMDIST / (Math.cos(this.offset) * this.dist))*this.fadeIn;
-        if (this.scale<0)
+        if (this.scale<=0)
             return;
 
         this.PhSprite.x = 200+Math.tan(this.offset)*CAMDIST-this.scale/2;
         this.PhSprite.y = 150+CAMZ;
         this.PhSprite.scale.setTo(this.scale,this.scale);
+        this.PhSprite.tint = Phaser.Color.interpolateColor(0xffffff,0x000000,3500,clamp(this.dist,0,3500),1);
         
         frameBuffer.draw(this.PhSprite);
     }
@@ -158,6 +173,53 @@ function cactus(x,y)
 
 }
 
+function tank(x,y)
+{
+    var parent = new entity(x,y,0,'tank');
+    for (var i in parent)
+        this[i] = parent[i];
+
+    this.angle = point_direction(this.x,this.y,CAMX,CAMY);
+    this.PhSprite.frame = 0;
+
+    this.step = function()
+    {
+            this.PhSprite.frame
+
+            if (this.PhSprite.frame === 0)
+                this.PhSprite.frame = 1;
+            else
+                this.PhSprite.frame = 0;
+            
+    }
+}
+
+function bullet(x,y,dir,speed,lspeed)
+{
+    var parent = new entity(x,y,0,'bullet');
+    for (var i in parent)
+        this[i] = parent[i];
+
+    this.xspeed = lengthdir_x(speed+lspeed,dir);
+    this.yspeed = lengthdir_y(speed+lspeed,dir);
+    this.life = 300;
+    this.fadeIn = 1;
+
+    console.log("MAKE BULLET");
+
+    this.step = function()
+    {
+        this.life--;
+        if (this.life<=0)
+            this.alive = false;
+
+        this.PhSprite.angle+=6;
+        this.x+=this.xspeed;
+        this.y+=this.yspeed;
+
+    }
+}
+
 function player(x,y)
 {
     this.x=x;
@@ -167,6 +229,8 @@ function player(x,y)
     this.gundir=0;
     this.cat=0;
     this.canSwap = true;
+    this.canShoot = true
+    this.shootTimer = 0;
 
     this.moveToDir = function()
     {
@@ -199,7 +263,7 @@ function player(x,y)
             }
             if (downKey.isDown)
             {
-                if (this.speed>0)
+                if (this.speed>-1)
                     this.speed-=0.1;
             }
             if (leftKey.isDown)
@@ -217,11 +281,18 @@ function player(x,y)
             //cannon cat
             if (leftKey.isDown)
             {
-                this.gundir--;
+                this.gundir-=2;
             }
             if (rightKey.isDown)
             {
-                this.gundir++;
+                this.gundir+=2;
+            }
+            if (shootKey.isDown && this.canShoot)
+            {
+                entityCreate( new bullet(this.x,this.y,this.gundir+Math.random()*8-4,8,this.speed) );
+                this.canShoot = false;
+                this.shootTimer = 16;
+                SCREEN_SHAKE += 16;
             }
         }
         else 
@@ -235,8 +306,21 @@ function player(x,y)
             // mine defuser cat
         }
 
-        if (this.speed>4)
-            this.speed = 4;
+        if (this.speed>3)
+            this.speed = 3;
+
+        if (this.shootTimer>0)
+        {
+            this.shootTimer--;
+        }
+        else 
+        {
+            this.canShoot = true;
+            this.shootTimer = 0
+        }
+
+        if (this.speed<0)
+            this.speed+=0.01
         this.moveToDir();
     }
 
@@ -251,6 +335,7 @@ function player(x,y)
         {
             CAMDIR = this.dir;
             CAMZ = 0;
+            this.gundir = this.dir;
         }
 
         CAMX = this.x;

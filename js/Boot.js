@@ -48,7 +48,7 @@ BasicGame.Boot.prototype = {
 
         // add our games keys
 
-        leftKey = game.input.keyboard.addKey(Phaser.Keyboard.LEFT);
+    leftKey = game.input.keyboard.addKey(Phaser.Keyboard.LEFT);
     game.input.keyboard.addKeyCapture(Phaser.Keyboard.LEFT);
 
     rightKey = game.input.keyboard.addKey(Phaser.Keyboard.RIGHT);
